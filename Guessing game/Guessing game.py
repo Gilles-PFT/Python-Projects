@@ -34,6 +34,8 @@ elif level == 3:
 guess = None
 count = 0
 score = 0  # Initialize score based on number of guesses
+Round = 1  # Initialize round variable
+score_tracker = []  # Initialize score tracker list to keep track of scores for each round
 
 # User input for guessing and feedback loop
 while guess != random_number:
@@ -65,4 +67,32 @@ while guess != random_number:
         print("Congratulations! You guessed the number!")
         print(f"You had it in {count} guesses.")
         print(f"Your final score is: {score}")
+        score_tracker.append(score)  # Add score to tracker
+        print(f"You have completed round {Round}.")
+
+        # Play again option
+        print("Do you want to play again? (yes/no)")
+        play_again = input().lower()
+        if play_again == "yes":
+            Round += 1
+            count = 0
+            score = 0
+            # Reset the random number based on the selected level
+            if level == 1:
+                random_number = random.randint(1, 20)
+            elif level == 2:
+                random_number = random.randint(1, 100)
+            elif level == 3:
+                random_number = random.randint(1, 500)
+
+            score_tracker.append(score)  # Add score to tracker
+        else:
+            print("Thank you for playing the Guessing Game!")
+            # Display the highest score from the score tracker
+            for scores in enumerate(score_tracker):
+                max_score = score_tracker[0]
+                if scores[1] > max_score:
+                    max_score = scores[1]
+            print(f"Your highest score was: {max_score}")
+            break
     
