@@ -23,7 +23,7 @@ elif level == 2:
     max_range = 100
     number_of_guesses = 7
     max_score = 500
-else:
+elif level == 3:
     print("You have selected Hard level. Try win the 1000 points!")
     random_number = random.randint(1, 500)
     max_range = 500
@@ -37,7 +37,13 @@ score = 0  # Initialize score based on number of guesses
 
 # User input for guessing and feedback loop
 while guess != random_number:
-    guess = int(input("Guess my number: "))
+    # Error handling for invalid input
+    try:
+        guess = int(input("Guess my number: "))
+    except ValueError:
+        print("Please enter a valid number.")
+        continue
+
     count += 1
     score = max_score-(count * 10)  # Decrease score based on number of guesses
 
@@ -59,3 +65,4 @@ while guess != random_number:
         print("Congratulations! You guessed the number!")
         print(f"You had it in {count} guesses.")
         print(f"Your final score is: {score}")
+    
