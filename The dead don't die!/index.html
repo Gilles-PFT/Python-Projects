@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Dead Don't Die - RPG</title>
+    
+    <!-- Load PyScript CSS and JS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #00ff66;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        /* Custom styling container for the PyScript terminal window */
+        py-terminal {
+            width: 800px;
+            height: 450px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>The Dead Don't Die</h1>
+    <p>A text-based RPG built with Python.</p>
+
+    <!-- PyScript will automatically inject the terminal UI here -->
+    <script type="py" src="./The_dead_don't_die.py" config="./pyscript.toml" terminal worker></script>
+
+</body>
+</html>
