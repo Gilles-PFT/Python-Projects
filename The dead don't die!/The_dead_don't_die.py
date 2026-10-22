@@ -51,7 +51,7 @@ def generate_room():
 
 def room_event_handling(room_type, player):
     """Acts as the game event controller managing event based on generated room"""
-    print(f"Event triggered: you encountered a {room_type}")
+    print(f"Event triggered: you encountered a/an {room_type} room")
     if room_type == "monster":
         print("... A zombie comes out to you !")
 
@@ -77,6 +77,7 @@ def movement(player):
             print(f"\nYou moved to room {Player['current_room']}.")
     elif choice == "n":
         Player["current_room"] += 1
+        Player["cleared_rooms"] += 1
         print(f"\nYou moved to room {Player['current_room']}.")
         # Rolling the room
         room_type = generate_room()
@@ -86,9 +87,11 @@ def movement(player):
     else:
         print("Invalid choice. Please try again.")
 
-    if Player["current_room"] == 4:
+    if Player["cleared_rooms"] == 3:
         Player["current_floor"] += 1
-        print(f"You moved to floor {Player['current_floor']}\n")
+        Player["current_room"] = 1
+        Player["cleared_rooms"] = 0
+        print(f"\n===== Welcome to floor {Player['current_floor']} =====\n")
 
 
 # Main game loop
