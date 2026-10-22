@@ -7,7 +7,7 @@ Player = {
     "max_health": 100,
     "attack": 10,
     "defense": 5,
-    "gold": 0,
+    "cash": 0,
     "inventory": [],
     "current_floor": 1,
     "current_room": 1,
@@ -25,7 +25,7 @@ def player_stats(player):
     print(f"Health: {Player['health']}/{Player['max_health']}")
     print(f"Attack: {Player['attack']}")
     print(f"Defense: {Player['defense']}")
-    print(f"Gold: {Player['gold']}")
+    print(f"Cash: {Player['cash']} CFA")
 
     # Adding seperator in inventory display
     print(f"Inventory: {', '.join(Player['inventory']) if Player['inventory'] else 'Empty'}")
@@ -39,18 +39,31 @@ def generate_room():
     monster_room, treasure_room, merchant_room, empty_room = 55, 25, 10, 10    # room encounter chances
     random_room = random.randint(0, 100)
     if random_room <= monster_room:
-        print("You encountered a monster!")
         room_type = "monster"
     elif random_room <= monster_room + treasure_room:
-        print("You found a treasure chest!")
         room_type = "treasure"
     elif random_room <= monster_room + treasure_room + merchant_room:
-        print("You found a merchant!")
         room_type = "merchant"
     else:
-        print("The room is empty.")
         room_type = "empty"
     return room_type
+    
+
+def room_event_handling(room_type, player):
+    """Acts as the game event controller managing event based on generated room"""
+    print(f"Event triggered: you encountered a {room_type}")
+    if room_type == "monster":
+        print("... A zombie comes out to you !")
+
+    elif room_type == "treasure":
+        print("... A full wallet grabs your attention !")
+        Player["cash"] += 5000
+
+    elif room_type == "merchant":
+        print("... A hiding bayam-sellam makes you a sign !")
+
+    else:
+        print("... The room is scarely silent. But nothing happens !")
 
 def movement(player):
     """Handles player's moving sequence"""
@@ -61,11 +74,15 @@ def movement(player):
             print("Your already in the first room.")
         else:
             Player["current_room"] -= 1
-            print(f"You moved to room {Player['current_room']}.\n")
+            print(f"\nYou moved to room {Player['current_room']}.")
     elif choice == "n":
         Player["current_room"] += 1
-        print(f"You moved to room {Player['current_room']}.\n")
-        generate_room()
+        print(f"\nYou moved to room {Player['current_room']}.")
+        # Rolling the room
+        room_type = generate_room()
+
+        # Handle the event
+        room_event_handling(room_type, Player)
     else:
         print("Invalid choice. Please try again.")
 
