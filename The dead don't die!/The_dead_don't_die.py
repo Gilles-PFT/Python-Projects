@@ -13,13 +13,13 @@ Player = {
     "current_room": 1,
     "cleared_rooms": 0
 }
-def Location(Player = Player):
+def location(player):
     """Displays players current location"""
     floor = Player['current_floor']
     room = Player['current_room']
     print(f"Floor level: Floor{floor}, Room{room}\n")
 
-def Player_stats(Player = Player):
+def player_stats(player):
     """Prints player's status, inventory and location"""
     print(f"\nName: {Player['name']}")
     print(f"Health: {Player['health']}/{Player['max_health']}")
@@ -31,9 +31,9 @@ def Player_stats(Player = Player):
     print(f"Inventory: {', '.join(Player['inventory']) if Player['inventory'] else 'Empty'}")
 
     # Printing floor and room level
-    Location()
+    location(Player)
 
-def Generate_room():
+def generate_room():
     """Generates a random room with a chance of encountering an enemy or finding treasure or a merchant."""
     import random
     monster_room, treasure_room, merchant_room, empty_room = 55, 25, 10, 10    # room encounter chances
@@ -41,37 +41,37 @@ def Generate_room():
     if random_room <= monster_room:
         print("You encountered a monster!")
         room_type = "monster"
-    elif random_room <= monster_room + treasure_room + merchant_room:
+    elif random_room <= monster_room + treasure_room:
         print("You found a treasure chest!")
         room_type = "treasure"
-    elif random_room <= monster_room + treasure_room + merchant_room + empty_room:
+    elif random_room <= monster_room + treasure_room + merchant_room:
         print("You found a merchant!")
         room_type = "merchant"
     else:
         print("The room is empty.")
         room_type = "empty"
+    return room_type
 
-def Movement(Player = Player):
+def movement(player):
     """Handles player's moving sequence"""
-    print("\nGo to previous floor(previous), next floor(next), or explore current floor(explore)?")
+    print("\nGo to previous or next room? [p/n]")
     choice = input("Enter your choice: ").lower()
-    if choice == "previous":
+    if choice == "p":
         if Player["current_room"] == 1:
+            print("Your already in the first room.")
+        else:
             Player["current_room"] -= 1
             print(f"You moved to room {Player['current_room']}.\n")
-        else:
-            print("You are already in the first room.\n")
-    elif choice == "next":
+    elif choice == "n":
         Player["current_room"] += 1
         print(f"You moved to room {Player['current_room']}.\n")
-        if Player["current_room"] == 3:
-            Player["current_floor"] += 1
-            print(f"You moved to floor {Player['current_floor']}")
-    elif choice == "explore":
-        print(f"Your exploring floor {Player['current_floor']}.\n")
-        Generate_room()
+        generate_room()
     else:
         print("Invalid choice. Please try again.")
+
+    if Player["current_room"] == 4:
+        Player["current_floor"] += 1
+        print(f"You moved to floor {Player['current_floor']}\n")
 
 
 # Main game loop
@@ -88,15 +88,15 @@ def main():
         choice = input("Select action to perform (1-3): ")
         
         if choice == "1":
-            Movement()
+            movement(Player)
         elif choice == "2":
-            Player_stats()
+            player_stats(Player)
             continue
         elif choice == "3":
             print("===== Thanks for playing! Goodbye! =====")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("Invalid choice. Please try again.\n")
 
 # Game launch
 main()
