@@ -17,7 +17,7 @@ def location(player):
     """Displays players current location"""
     floor = Player['current_floor']
     room = Player['current_room']
-    print(f"Floor level: Floor{floor}, Room{room}\n")
+    return f"Floor level: Floor{floor}, Room{room}\n"
 
 def player_stats(player):
     """Prints player's status, inventory and location"""
@@ -31,7 +31,7 @@ def player_stats(player):
     print(f"Inventory: {', '.join(Player['inventory']) if Player['inventory'] else 'Empty'}")
 
     # Printing floor and room level
-    location(Player)
+    print(location(Player))
 
 def generate_room():
     """Generates a random room with a chance of encountering an enemy or finding treasure or a merchant."""
@@ -47,13 +47,62 @@ def generate_room():
     else:
         room_type = "empty"
     return room_type
-    
 
+def generate_monster(player):
+    """Generates a random monster"""
+    import random
+    # Zombie database categorized by difficulty / floor tier
+    MONSTER_POOL = {
+        "tier_1": [
+            # Canon fodder & agile basic enemies
+            {"name": "Walker", "hp": 25, "attack": 6, "defense": 1, "xp": 10},
+            {"name": "Crawler", "hp": 15, "attack": 4, "defense": 0, "xp": 8},
+            {"name": "Runner", "hp": 20, "attack": 9, "defense": 1, "xp": 12},
+        ],
+        "tier_2": [
+            # Disruptors, ranged threats, and stealth units
+            {"name": "Stalker", "hp": 35, "attack": 12, "defense": 2, "xp": 20},
+            {"name": "Spitter", "hp": 30, "attack": 15, "defense": 1, "xp": 22},
+            {"name": "Screamer", "hp": 25, "attack": 5, "defense": 1, "xp": 18},
+            {"name": "Grabber", "hp": 40, "attack": 10, "defense": 3, "xp": 25},
+            {"name": "Fogger", "hp": 45, "attack": 8, "defense": 2, "xp": 24},
+        ],
+        "tier_3": [
+            # Heavy tanks, hazardous units, and armored foes
+            {"name": "Armored Zombie", "hp": 70, "attack": 14, "defense": 6, "xp": 40},
+            {"name": "Bloater", "hp": 50, "attack": 18, "defense": 2, "xp": 35},
+            {"name": "Brute", "hp": 90, "attack": 16, "defense": 5, "xp": 50},
+        ],
+        "boss": [
+            # Major threats for boss floors
+            {"name": "The Alpha Abomination", "hp": 200, "attack": 25, "defense": 8, "xp": 150}
+        ]
+    }
+    # Determine the tier based on the player's current floor
+    if Player["current_floor"] <= 3:
+        tier = "tier_1"
+    elif Player["current_floor"] <= 6:
+        tier = "tier_2"
+    else:
+        tier = "tier_3"
+
+    # Spawn boss on every 3rd floor
+    if Player["current_floor"] % 3 == 0:
+        tier = "boss"
+
+    # Randomly select a monster from the appropriate tier and make a copy of it to avoid modifying the original monster data
+    monster = random.choice(MONSTER_POOL[tier])
+    monster = monster.copy()
+    return monster
+
+    
 def room_event_handling(room_type, player):
     """Acts as the game event controller managing event based on generated room"""
     print(f"Event triggered: you encountered a/an {room_type} room")
     if room_type == "monster":
         print("... A zombie comes out to you !")
+        monster = generate_monster(player)
+        # Handle the battle logic here
 
     elif room_type == "treasure":
         print("... A full wallet grabs your attention !")
@@ -87,7 +136,7 @@ def movement(player):
     else:
         print("Invalid choice. Please try again.")
 
-    if Player["cleared_rooms"] == 3:
+    if Player["cleared_rooms"] == 5:
         Player["current_floor"] += 1
         Player["current_room"] = 1
         Player["cleared_rooms"] = 0
