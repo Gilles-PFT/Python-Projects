@@ -10,7 +10,7 @@ Player = {
     "attack": 10,
     "defense": 5,
     "cash": 0,
-    "inventory": [],
+    "inventory": set(),
     "current_floor": 1,
     "current_room": 1,
     "cleared_rooms": 0
@@ -139,6 +139,7 @@ def battle(player, monster):
 def room_event_handling(room_type, player):
     """Acts as the game event controller managing event based on generated room"""
     print(f"Event triggered: you encountered a/an {room_type} room")
+    # Handle the event based on the room type
     if room_type == "monster":
         print("... A zombie comes out to you !")
         monster = generate_monster(player)
@@ -148,11 +149,21 @@ def room_event_handling(room_type, player):
             print("===== Game Over! You have been defeated! =====")
             exit()
 
-
     elif room_type == "treasure":
-        print("... A full wallet grabs your attention !")
-        Player["cash"] += 5000
-
+        print("... An open safe box grabs your attention !")
+        reward = random.choice(["cash", "garri", "weapon"])
+        if reward == "cash":
+            Player["cash"] += 5000
+            print("You found 5000 coins!")
+        elif reward == "garri":
+            Player["health"] += 10
+            if Player["health"] > Player["max_health"]:
+                Player["health"] = Player["max_health"]
+            print("You found some garri and restored your health!")
+        else:
+            Player["attack"] += 5
+            print("You found a new weapon and increased your attack!")
+            
     elif room_type == "merchant":
         print("... A hiding bayam-sellam makes you a sign !")
 
@@ -163,6 +174,7 @@ def movement(player):
     """Handles player's moving sequence"""
     print("\nGo to previous or next room? [p/n]")
     choice = input("Enter your choice: ").lower()
+    # Handle the movement based on the player's choice
     if choice == "p":
         if Player["current_room"] == 1:
             print("Your already in the first room.")
@@ -181,6 +193,7 @@ def movement(player):
     else:
         print("Invalid choice. Please try again.")
 
+    # Check if the player has cleared 5 rooms to move to the next floor
     if Player["cleared_rooms"] == 5:
         Player["current_floor"] += 1
         Player["current_room"] = 1
