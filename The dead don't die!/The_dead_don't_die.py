@@ -142,7 +142,53 @@ def battle(player, monster):
             continue
 
     return "Victory"
-    
+
+def merchant_interaction(player):
+    """Handles the interaction with the merchant"""
+    while True:
+        print("\nMerchant's Inventory:")
+        print("1. garri (100 CFA)")
+        print("2. water bottle (250 CFA)")
+        print("3. body armor (2500 CFA)")
+        print("4. knuckle (5000 CFA)")
+        print("5. Exit Merchant")
+
+        choice = input("Select an item to buy (1-5): ")
+        if choice == "1":
+            if Player["cash"] >= 100:
+                Player["cash"] -= 100
+                Player["inventory"]["garri"] = Player["inventory"].get("garri", 0) + 1
+                print("You bought garri!")
+            
+            else:
+                print("You don't have enough cash!")
+        elif choice == "2":
+            if Player["cash"] >= 250:
+                Player["cash"] -= 250
+                Player["inventory"]["water bottle"] = Player["inventory"].get("water bottle", 0) + 1
+                print("You bought a water bottle!")
+            else:
+                print("You don't have enough cash!")
+        elif choice == "3":
+            if Player["cash"] >= 2500:
+                Player["cash"] -= 2500
+                Player["inventory"]["body armor"] = Player["inventory"].get("body armor", 0) + 1
+                print("You bought body armor!")
+            else:
+                print("You don't have enough cash!")
+        elif choice == "4":
+            if Player["cash"] >= 5000:
+                Player["cash"] -= 5000
+                Player["inventory"]["knuckle"] = Player["inventory"].get("knuckle", 0) + 1
+                print("You bought a knuckle!")
+            else:
+                print("You don't have enough cash!")
+        elif choice == "5":
+            print("You leave the merchant.")
+            break
+        else:
+            print("Invalid choice. Please select again.")
+
 def room_event_handling(room_type, player):
     """Acts as the game event controller managing event based on generated room"""
     print(f"Event triggered: you encountered a/an {room_type} room")
@@ -175,7 +221,7 @@ def room_event_handling(room_type, player):
             
     elif room_type == "merchant":
         print("... A hiding bayam-sellam makes you a sign !")
-
+        merchant_interaction(Player)
     else:
         print("... The room is scarely silent. But nothing happens !")
 
@@ -203,7 +249,7 @@ def use_inventory(player):
                     player["health"] = player["max_health"]
                 print("You used garri and restored your health!")
             elif item_name == "water bottle":
-                player["health"] += 5
+                player["health"] += 15
                 if player["health"] > player["max_health"]:
                     player["health"] = player["max_health"]
                 print("You drank water and restored some health!")
@@ -218,6 +264,7 @@ def use_inventory(player):
             print("Invalid choice. Please try again.")
     except ValueError:
         print("Invalid input. Please enter a number.")
+    
 def movement(player):
     """Handles player's moving sequence"""
     print("\nGo to previous or next room? [p/n]")
