@@ -1,5 +1,7 @@
 # A command line RPG game
 
+import random
+
 # Character sheet
 Player = {
     "name": "",
@@ -35,7 +37,6 @@ def player_stats(player):
 
 def generate_room():
     """Generates a random room with a chance of encountering an enemy or finding treasure or a merchant."""
-    import random
     monster_room, treasure_room, merchant_room, empty_room = 55, 25, 10, 10    # room encounter chances
     random_room = random.randint(0, 100)
     if random_room <= monster_room:
@@ -50,7 +51,6 @@ def generate_room():
 
 def generate_monster(player):
     """Generates a random monster"""
-    import random
     # Zombie database categorized by difficulty / floor tier
     MONSTER_POOL = {
         "tier_1": [
@@ -95,6 +95,46 @@ def generate_monster(player):
     monster = monster.copy()
     return monster
 
+def battle(player, monster):
+    """Handles the battle sequence between player and monster"""
+    print(f"You encounter a {monster['name']}!")
+    while player["health"] > 0 and monster["hp"] > 0:
+        print(f"\nYour Health: {player['health']}")
+        print(f"{monster['name']} Health: {monster['hp']}")
+
+        action = input("Choose your action: [A]ttack or [R]un: ").lower()
+        if action == "a":
+            # Player attacks
+            damage_to_monster = max(1, player["attack"] - monster["defense"])
+            monster["hp"] -= damage_to_monster
+            print(f"You dealt {damage_to_monster} damage to {monster['name']}!")
+
+            if monster["hp"] <= 0:
+                print(f"You defeated the {monster['name']}!")
+                player["cash"] += monster["xp"] * 10  # Reward cash based on XP
+                break
+
+            # Monster attacks
+            damage_to_player = max(1, monster["attack"] - player["defense"])
+            player["health"] -= damage_to_player
+            print(f"{monster['name']} dealt {damage_to_player} damage to you!")
+
+            if player["health"] <= 0:
+                print("\nYou have been defeated!")
+                return "Game Over."
+            
+
+        elif action == "r":
+            if random.random() < 0.50:
+                print("You ran away safely!")
+                break
+            else:
+                print("\nYour escape attempt failed! The monster attacks you!")
+        else:
+            print("\nInvalid action. Please choose again.")
+            continue
+
+    return "Victory"
     
 def room_event_handling(room_type, player):
     """Acts as the game event controller managing event based on generated room"""
@@ -102,7 +142,12 @@ def room_event_handling(room_type, player):
     if room_type == "monster":
         print("... A zombie comes out to you !")
         monster = generate_monster(player)
-        # Handle the battle logic here
+        # Enter the battle sequence
+        battle_result = battle(player, monster)
+        if battle_result == "Game Over.":
+            print("===== Game Over! You have been defeated! =====")
+            exit()
+
 
     elif room_type == "treasure":
         print("... A full wallet grabs your attention !")
@@ -149,7 +194,7 @@ def main():
     Player["name"] = input("Enter your character's name: ").capitalize()
     print(f"\nWelcome {Player['name']}!\n")
     
-    while True:
+    while Player["health"] > 0:
         print("1. Move")
         print("2. Check Status")
         print("3. Exit Game")
