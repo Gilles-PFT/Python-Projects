@@ -10,7 +10,11 @@ Player = {
     "attack": 10,
     "defense": 5,
     "cash": 0,
-    "inventory": set(),
+    "inventory": {
+        "garri": 1,
+        "water bottle": 2,
+    },
+    "equipment": {},
     "current_floor": 1,
     "current_room": 1,
     "cleared_rooms": 0
@@ -30,7 +34,10 @@ def player_stats(player):
     print(f"Cash: {Player['cash']} CFA")
 
     # Adding seperator in inventory display
-    print(f"Inventory: {', '.join(Player['inventory']) if Player['inventory'] else 'Empty'}")
+    print(f"Inventory: {', '.join([f'{item}: {qty}' for item, qty in Player['inventory'].items()]) if Player['inventory'] else 'Empty'}")
+
+    # Adding seperator in equipment display
+    print(f"Equipment: {', '.join([f'{item}: {details['attack']}' for item, details in Player['equipment'].items()]) if Player['equipment'] else 'None'}")
 
     # Printing floor and room level
     print(location(Player))
@@ -79,9 +86,9 @@ def generate_monster(player):
         ]
     }
     # Determine the tier based on the player's current floor
-    if Player["current_floor"] <= 3:
+    if Player["current_floor"] <= 2:
         tier = "tier_1"
-    elif Player["current_floor"] <= 6:
+    elif Player["current_floor"] <= 4:
         tier = "tier_2"
     else:
         tier = "tier_3"
@@ -151,18 +158,20 @@ def room_event_handling(room_type, player):
 
     elif room_type == "treasure":
         print("... An open safe box grabs your attention !")
-        reward = random.choice(["cash", "garri", "weapon"])
+        weapon = random.choice([{"name": "Knife", "attack": 5}, {"name": "Baseball Bat", "attack": 8}, {"name": "Axe", "attack": 6}])
+        reward = random.choice(["cash", "garri", weapon])
         if reward == "cash":
             Player["cash"] += 5000
-            print("You found 5000 coins!")
+            print("You found 5000 CFA!")
         elif reward == "garri":
             Player["health"] += 10
             if Player["health"] > Player["max_health"]:
                 Player["health"] = Player["max_health"]
             print("You found some garri and restored your health!")
         else:
-            Player["attack"] += 5
-            print("You found a new weapon and increased your attack!")
+            Player["equipment"][weapon["name"]] = weapon # Add the weapon to the player's equipment
+            Player["attack"] += weapon["attack"]
+            print(f"You found {weapon['name']} and increased your attack!")
             
     elif room_type == "merchant":
         print("... A hiding bayam-sellam makes you a sign !")
@@ -170,6 +179,45 @@ def room_event_handling(room_type, player):
     else:
         print("... The room is scarely silent. But nothing happens !")
 
+def use_inventory(player):
+    """Handles the player's inventory usage"""
+    if not player["inventory"]:
+        print("Your inventory is empty.")
+        return
+
+    print("\nYour Inventory:")
+    for index, (item, quantity) in enumerate(player["inventory"].items(), start=1):
+        print(f"{index}. {item} (Quantity: {quantity})")
+
+    choice = input("Enter the number of the item you want to use (or 'q' to cancel): ")
+    if choice.lower() == 'q':
+        return
+
+    try:
+        choice_index = int(choice) - 1
+        if 0 <= choice_index < len(player["inventory"]):
+            item_name = list(player["inventory"].keys())[choice_index]
+            if item_name == "garri":
+                player["health"] += 10
+                if player["health"] > player["max_health"]:
+                    player["health"] = player["max_health"]
+                print("You used garri and restored your health!")
+            elif item_name == "water bottle":
+                player["health"] += 5
+                if player["health"] > player["max_health"]:
+                    player["health"] = player["max_health"]
+                print("You drank water and restored some health!")
+            else:
+                print(f"You used {item_name}, but nothing happened.")
+
+            # Decrease the quantity of the used item
+            player["inventory"][item_name] -= 1
+            if player["inventory"][item_name] <= 0:
+                del player["inventory"][item_name]
+        else:
+            print("Invalid choice. Please try again.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
 def movement(player):
     """Handles player's moving sequence"""
     print("\nGo to previous or next room? [p/n]")
@@ -210,9 +258,10 @@ def main():
     while Player["health"] > 0:
         print("1. Move")
         print("2. Check Status")
-        print("3. Exit Game")
+        print("3. Use Item")
+        print("4. Exit Game")
         
-        choice = input("Select action to perform (1-3): ")
+        choice = input("Select action to perform (1-4): ")
         
         if choice == "1":
             movement(Player)
@@ -220,6 +269,8 @@ def main():
             player_stats(Player)
             continue
         elif choice == "3":
+            use_inventory(Player)
+        elif choice == "4":
             print("===== Thanks for playing! Goodbye! =====")
             break
         else:
