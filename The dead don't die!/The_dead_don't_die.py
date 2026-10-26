@@ -36,8 +36,11 @@ def player_stats(player):
     # Adding seperator in inventory display
     print(f"Inventory: {', '.join([f'{item}: {qty}' for item, qty in Player['inventory'].items()]) if Player['inventory'] else 'Empty'}")
 
-    # Adding seperator in equipment display
-    print(f"Equipment: {', '.join([f'{item}: {details['attack']}' for item, details in Player['equipment'].items()]) if Player['equipment'] else 'None'}")
+    equipment = []
+    for item, details in player["equipment"].items():
+        stats = ", ".join(f"{stat} +{value}" for stat, value in details.items())
+        equipment.append(f"{item}: {stats}")
+    print(f"Equipment: {', '.join(equipment) if equipment else 'None'}")
 
     # Printing floor and room level
     print(location(Player))
@@ -172,15 +175,19 @@ def merchant_interaction(player):
         elif choice == "3":
             if Player["cash"] >= 2500:
                 Player["cash"] -= 2500
-                Player["inventory"]["body armor"] = Player["inventory"].get("body armor", 0) + 1
-                print("You bought body armor!")
+                armor = Player["equipment"].setdefault("body armor", {"defense": 0})
+                armor["defense"] += 20
+                Player["defense"] += 20
+                print("You bought body armor! Defense +20.")
             else:
                 print("You don't have enough cash!")
         elif choice == "4":
             if Player["cash"] >= 5000:
                 Player["cash"] -= 5000
-                Player["inventory"]["knuckle"] = Player["inventory"].get("knuckle", 0) + 1
-                print("You bought a knuckle!")
+                knuckle = Player["equipment"].setdefault("knuckle", {"attack": 0})
+                knuckle["attack"] += 25
+                Player["attack"] += 25
+                print("You bought a knuckle! Attack +25.")
             else:
                 print("You don't have enough cash!")
         elif choice == "5":
@@ -201,7 +208,14 @@ def room_event_handling(room_type, player):
         if battle_result == "Game Over.":
             print("===== Game Over! You have been defeated! =====")
             exit()
-
+        else:
+            brother_floor = random.randint(5,10)
+            brother_room = random.randint(2,5)
+            if Player["current_floor"] == brother_floor and Player["current_room"] == brother_room:
+                print("\n====== You find your junior congratulations !!! ======")
+                print("\n====== You escape and live the building together ======")
+                exit()
+    
     elif room_type == "treasure":
         print("... An open safe box grabs your attention !")
         weapon = random.choice([{"name": "Knife", "attack": 5}, {"name": "Baseball Bat", "attack": 8}, {"name": "Axe", "attack": 6}])
@@ -215,14 +229,23 @@ def room_event_handling(room_type, player):
                 Player["health"] = Player["max_health"]
             print("You found some garri and restored your health!")
         else:
-            Player["equipment"][weapon["name"]] = weapon # Add the weapon to the player's equipment
+            equipment = Player["equipment"].setdefault(weapon["name"], {"attack": 0})
+            equipment["attack"] += weapon["attack"]
             Player["attack"] += weapon["attack"]
             print(f"You found {weapon['name']} and increased your attack!")
             
     elif room_type == "merchant":
         print("... A hiding bayam-sellam makes you a sign !")
-        merchant_interaction(Player)
-    else:
+        buy = input("Do you want to buy? [Y/n]: ").lower()
+        try:
+            if buy == "Y":
+                merchant_interaction(Player)
+            elif buy == "n":
+                print("The buyam tie his face and goes...\n")
+        except  ValueError:
+            print("invalid entry")
+
+    elif room_type == "empty":
         print("... The room is scarely silent. But nothing happens !")
 
 def use_inventory(player):
@@ -294,17 +317,12 @@ def movement(player):
         Player["current_room"] = 1
         Player["cleared_rooms"] = 0
         print(f"\n===== Welcome to floor {Player['current_floor']} =====\n")
-
-    elif Player["current_floor"] == 6 and Player["cleared_rooms"] == 4:
-        print("\n===== You found your junior brother! =====")
-        print("You have successfully completed the game!")
-        break
-
+        
 # Main game loop
 def main():
     print("===== Welcome to the Dead Don't Die! =====")
     Player["name"] = input("Enter your character's name: ").capitalize()
-    print(f"\nWelcome {Player['name']}!\n")
+    print(f"\nWelcome {Player['name']}. Your junior is somewhere hidding waiting for you!\n")
     
     while Player["health"] > 0:
         print("1. Move")
