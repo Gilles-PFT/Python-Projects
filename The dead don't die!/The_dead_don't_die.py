@@ -295,6 +295,10 @@ def movement(player):
         Player["cleared_rooms"] = 0
         print(f"\n===== Welcome to floor {Player['current_floor']} =====\n")
 
+    elif Player["current_floor"] == 6 and Player["cleared_rooms"] == 4:
+        print("\n===== You found your junior brother! =====")
+        print("You have successfully completed the game!")
+        break
 
 # Main game loop
 def main():
