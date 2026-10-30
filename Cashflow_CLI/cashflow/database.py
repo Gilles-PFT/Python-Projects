@@ -24,7 +24,7 @@ def load_data():
                 json.load(file)
         except json.JSONDecodeError:
             print("[Warning] finance.json was corrupted. Reseting data structure.")
-            return {"transactions": [], "budget": {}, "goals": []}
+            return {"transactions": [], "budgets": {}, "goals": []}
 
 def add_transaction(amount: float, t_type: str, category: str, description: str):
     """Creates a financial dictionary and saves it to finance.json"""
@@ -46,4 +46,48 @@ def add_transaction(amount: float, t_type: str, category: str, description: str)
     # Adding to list and saving back to file
     data["transactions"].append(transaction)
     save_data(data)
-    return  transaction
+    return  transaction  
+
+def set_budget(category: str, limit: float):
+    """Sets a monthly spending cap for a specific category"""
+    data = load_data()
+
+    # Accessing budget section
+    data["budgets"][category] = limit 
+
+    # Saving back to json file
+    save_data(data)
+    return data["budget"] 
+
+def set_goal(name: str, target_amt: float):
+    """Sets a financial target"""
+    data = load_data()
+
+    # Goal defifnition items
+    new_goal = {
+        "name": name,
+        "target": target_amt,  
+        "current_amount": 0.0,
+        "status": "Incomplete"
+        }
+    
+    # Adding to list and saving back to file
+    data["goals"].append(new_goal)
+    save_data(data)
+    return new_goal
+
+def goal_contribution(goal_name: str, amount: float):
+    """Add money to existing goal"""
+    data = load_data()
+
+    for goal in data["goals"]:
+        try:
+            if goal["name"].lower() == goal_name.lower():
+                goal["current_amount"] += amount
+                if goal["current_amount"] >= goal["target"]:
+                    goal["status"] = "Complete"
+                save_data()
+                return goal
+        except ValueError:
+            print(f"'{goal_name}' not found.")
+        
