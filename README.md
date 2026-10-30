@@ -35,8 +35,3 @@ To run any of the Python projects in this repository, ensure you have the follow
 * **Gilles-PFT**  
 * GitHub: [@Gilles-PFT](https://github.com/Gilles-PFT)
 
----
-
-## 📝 License
-
-Distributed under the MIT License. See the `LICENSE` file for more information.
