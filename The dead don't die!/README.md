@@ -5,7 +5,7 @@ A survival horror text-based RPG where you climb a zombie-infested building in D
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
-**[Play Demo](https://demo-delta-rose-90.vercel.app/)** *(Tip: Click inside the terminal screen once the page loads to type your choices!)*
+**[Play Demo](https://demo-delta-rose-90.vercel.app/)** *(Tip: Wait for the welcome message to print first!)*
 
 ---
 
