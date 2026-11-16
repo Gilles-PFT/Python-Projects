@@ -4,7 +4,8 @@ from pathlib import Path
 from datetime import datetime
 
 # Defining where the JSON file will live
-DATA_FILE = Path("finance.json")
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_FILE = BASE_DIR / "finance.json"
 
 def save_data(data: dict):
     """Takes a dictionary and writes it to finance.json"""
@@ -15,13 +16,13 @@ def load_data():
     """Loads financial data from json file and creates default structure if doesn't exist"""
     # Default structure creature
     if not DATA_FILE.exists():
-        default_data = {"transactions": [], "budget": {}, "goals": []}
+        default_data = {"transactions": [], "budgets": {}, "goals": []}
         save_data(default_data)
         return default_data
     else:
         try:
             with open(DATA_FILE, "r") as file:
-                json.load(file)
+                return json.load(file)
         except json.JSONDecodeError:
             print("[Warning] finance.json was corrupted. Reseting data structure.")
             return {"transactions": [], "budgets": {}, "goals": []}
@@ -36,7 +37,7 @@ def add_transaction(amount: float, t_type: str, category: str, description: str)
     # Building transaction dictionary
     transaction = {
         "id": new_id,
-        "date": datetime.now().strftime("%Y-%m-%D %H:%M"),
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "type": t_type.lower(),    # income or expense
         "category": category,
         "amount": float(amount),
@@ -57,7 +58,7 @@ def set_budget(category: str, limit: float):
 
     # Saving back to json file
     save_data(data)
-    return data["budget"] 
+    return data["budgets"] 
 
 def set_goal(name: str, target_amt: float):
     """Sets a financial target"""
@@ -81,13 +82,10 @@ def goal_contribution(goal_name: str, amount: float):
     data = load_data()
 
     for goal in data["goals"]:
-        try:
-            if goal["name"].lower() == goal_name.lower():
-                goal["current_amount"] += amount
-                if goal["current_amount"] >= goal["target"]:
-                    goal["status"] = "Complete"
-                save_data()
-                return goal
-        except ValueError:
-            print(f"'{goal_name}' not found.")
-        
+        if goal["name"].strip().lower() == goal_name.strip().lower():
+            goal["current_amount"] += amount
+            if goal["current_amount"] >= goal["target"]:
+                goal["status"] = "Complete"
+            save_data(data)
+            return goal
+    return None
