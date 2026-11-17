@@ -18,13 +18,6 @@ Here is a list of the projects currently hosted in this repository:
 
 ---
 
-## 🚀 Quick Navigation to Sub-Projects
-
-If you want to dive straight into a specific project's documentation, use the links below:
-
-* **[The Dead Don't Die! Documentation & Guide](./The%20dead%20don't%20die!/README.md)**
-
----
 
 ## 🛠️ General Requirements
 
