@@ -31,7 +31,7 @@ cd Python-Projects/Guessing game
 
 3. Run the script:
 ```bash
-python Guessing_game.py
+python The_Guessing_game.py
 ```
 ## How to play
 
