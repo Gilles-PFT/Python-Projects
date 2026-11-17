@@ -1,3 +1,2 @@
-cyper
+typer
 rich
-pytest
